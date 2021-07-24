@@ -36,6 +36,8 @@ var (
 	PriceBasedExpanderName = "price"
 	// PriorityBasedExpanderName selects a node group based on a user-configured priorities assigned to group names
 	PriorityBasedExpanderName = "priority"
+	// GRPCExpanderName uses the gRPC client expander to call to an external gRPC server to select a node group for scale up
+	GRPCExpanderName = "grpc"
 )
 
 // Option describes an option to expand the cluster.

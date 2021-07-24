@@ -152,6 +152,9 @@ var (
 	expanderFlag = flag.String("expander", expander.RandomExpanderName,
 		"Type of node group expander to be used in scale up. Available values: ["+strings.Join(expander.AvailableExpanders, ",")+"]")
 
+	fallbackExpanderFlag = flag.String("fallback-expander", "",
+	  "Type of node group expander to fallback to when using gRPC expander. Available values: ["+strings.Join(expander.AvailableExpanders, ",")+"]")
+
 	ignoreDaemonSetsUtilization = flag.Bool("ignore-daemonsets-utilization", false,
 		"Should CA ignore DaemonSet pods when calculating resource utilization for scaling down")
 	ignoreMirrorPodsUtilization = flag.Bool("ignore-mirror-pods-utilization", false,
@@ -213,6 +216,7 @@ func createAutoscalingOptions() config.AutoscalingOptions {
 		ScaleUpFromZero:                    *scaleUpFromZero,
 		EstimatorName:                      *estimatorFlag,
 		ExpanderName:                       *expanderFlag,
+		FallbackExpanderName:               *fallbackExpanderFlag,
 		IgnoreDaemonSetsUtilization:        *ignoreDaemonSetsUtilization,
 		IgnoreMirrorPodsUtilization:        *ignoreMirrorPodsUtilization,
 		MaxBulkSoftTaintCount:              *maxBulkSoftTaintCount,

@@ -71,6 +71,8 @@ type AutoscalingOptions struct {
 	EstimatorName string
 	// ExpanderName sets the type of node group expander to be used in scale up
 	ExpanderName string
+	// FallbackExpanderName sets the fallback expander when using gRPC expander
+	FallbackExpanderName string
 	// IgnoreDaemonSetsUtilization is whether CA will ignore DaemonSet pods when calculating resource utilization for scaling down
 	IgnoreDaemonSetsUtilization bool
 	// IgnoreMirrorPodsUtilization is whether CA will ignore Mirror pods when calculating resource utilization for scaling down

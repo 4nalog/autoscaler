@@ -20,7 +20,8 @@ import (
 	"k8s.io/autoscaler/cluster-autoscaler/cloudprovider"
 	"k8s.io/autoscaler/cluster-autoscaler/context"
 	"k8s.io/autoscaler/cluster-autoscaler/expander"
-	"k8s.io/autoscaler/cluster-autoscaler/expander/mostpods"
+  "k8s.io/autoscaler/cluster-autoscaler/expander/grpcplugin"
+  "k8s.io/autoscaler/cluster-autoscaler/expander/mostpods"
 	"k8s.io/autoscaler/cluster-autoscaler/expander/price"
 	"k8s.io/autoscaler/cluster-autoscaler/expander/priority"
 	"k8s.io/autoscaler/cluster-autoscaler/expander/random"
@@ -32,10 +33,24 @@ import (
 )
 
 // ExpanderStrategyFromString creates an expander.Strategy according to its name
-func ExpanderStrategyFromString(expanderFlag string, cloudProvider cloudprovider.CloudProvider,
+func ExpanderStrategyFromString(expanderFlag string, fallbackExpanderFlag string, cloudProvider cloudprovider.CloudProvider,
 	autoscalingKubeClients *context.AutoscalingKubeClients, kubeClient kube_client.Interface,
 	configNamespace string) (expander.Strategy, errors.AutoscalerError) {
-	switch expanderFlag {
+
+  // For GRPC expander, get the fallback strategy recursively. Ensure fallback expander is not GRPC so there is no infinite loop.
+  if expanderFlag == expander.GRPCExpanderName {
+    if fallbackExpanderFlag == expander.GRPCExpanderName {
+      return nil, errors.NewAutoscalerError(errors.ConfigurationError, "grpc expander is not a valid fallback for itself.")
+    }
+    fallbackExpander, err := ExpanderStrategyFromString(fallbackExpanderFlag, "", cloudProvider,
+      autoscalingKubeClients, kubeClient, configNamespace)
+    if err != nil {
+      return nil, err
+    }
+    return grpcplugin.NewStrategy(fallbackExpander), nil
+  }
+
+  switch expanderFlag {
 	case expander.RandomExpanderName:
 		return random.NewStrategy(), nil
 	case expander.MostPodsExpanderName:
