@@ -19,18 +19,21 @@ type grpcclientstrategy struct {
 }
 
 // NewStrategy returns a strategy that calls out to an external gRPC server to find the best option
-func NewStrategy(fallbackStrategy expander.Strategy) expander.Strategy {
-  // ca file
-  // if ca file
-  caFile := "x50a/ca_cert.pem"
-  creds, err := credentials.NewClientTLSFromFile(*caFile, "serverHostnameOverride")
-  if err != nil {
-    log.Fatalf("Failed to create TLS credentials %v", err)
+func NewStrategy(fallbackStrategy expander.Strategy, grpcExpanderCert string, grpcExpanderURL string) expander.Strategy {
+
+  var dialOpt grpc.DialOption
+  // if no Cert file specified, use insecure
+  if grpcExpanderCert == "" {
+    dialOpt = grpc.WithInsecure()
+  } else {
+    creds, err := credentials.NewClientTLSFromFile(grpcExpanderCert, "")
+    if err != nil {
+      log.Fatalf("Failed to create TLS credentials %v", err)
+    }
+    dialOpt = grpc.WithTransportCredentials(creds)
   }
-  dialOpt := grpc.WithTransportCredentials(creds)
-  // else, insexcure
-  dialOpt = grpc.WithInsecure()
-  conn, err := grpc.Dial("serveraddr", dialOpt)
+
+  conn, err := grpc.Dial(grpcExpanderURL, dialOpt)
   if err != nil {
     log.Fatalf("fail to dial: %v", err)
   }

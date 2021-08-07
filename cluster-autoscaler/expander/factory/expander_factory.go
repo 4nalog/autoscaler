@@ -33,7 +33,7 @@ import (
 )
 
 // ExpanderStrategyFromString creates an expander.Strategy according to its name
-func ExpanderStrategyFromString(expanderFlag string, fallbackExpanderFlag string, cloudProvider cloudprovider.CloudProvider,
+func ExpanderStrategyFromString(expanderFlag string, fallbackExpanderFlag string, grpcExpanderCert string, grpcExpanderURL string, cloudProvider cloudprovider.CloudProvider,
 	autoscalingKubeClients *context.AutoscalingKubeClients, kubeClient kube_client.Interface,
 	configNamespace string) (expander.Strategy, errors.AutoscalerError) {
 
@@ -42,12 +42,13 @@ func ExpanderStrategyFromString(expanderFlag string, fallbackExpanderFlag string
     if fallbackExpanderFlag == expander.GRPCExpanderName {
       return nil, errors.NewAutoscalerError(errors.ConfigurationError, "grpc expander is not a valid fallback for itself.")
     }
-    fallbackExpander, err := ExpanderStrategyFromString(fallbackExpanderFlag, "", cloudProvider,
+    fallbackExpander, err := ExpanderStrategyFromString(fallbackExpanderFlag, "", grpcExpanderCert, grpcExpanderURL, cloudProvider,
       autoscalingKubeClients, kubeClient, configNamespace)
     if err != nil {
       return nil, err
     }
-    return grpcplugin.NewStrategy(fallbackExpander), nil
+    // TODO: do we want to pass both cert/url down here, or create a new grpcExpander opts struct?
+    return grpcplugin.NewStrategy(fallbackExpander, grpcExpanderCert, grpcExpanderURL), nil
   }
 
   switch expanderFlag {

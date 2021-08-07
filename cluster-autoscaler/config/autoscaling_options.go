@@ -73,6 +73,10 @@ type AutoscalingOptions struct {
 	ExpanderName string
 	// FallbackExpanderName sets the fallback expander when using gRPC expander
 	FallbackExpanderName string
+	// GRPCExpanderCert is the location of the cert passed to the gRPC server for TLS when using the gRPC expander
+	GRPCExpanderCert string
+	// GRPCExpanderURL is the url of the gRPC server when using the gRPC expander
+	GRPCExpanderURL string
 	// IgnoreDaemonSetsUtilization is whether CA will ignore DaemonSet pods when calculating resource utilization for scaling down
 	IgnoreDaemonSetsUtilization bool
 	// IgnoreMirrorPodsUtilization is whether CA will ignore Mirror pods when calculating resource utilization for scaling down
